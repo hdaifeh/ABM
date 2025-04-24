@@ -1,0 +1,20 @@
+public class WasteManager {
+    private double[] equipmentCapacities;
+    private double capacityIncreaseRate;
+
+    public WasteManager(double[] initialCapacities, double increaseRate) {
+        equipmentCapacities = new double[3];
+        System.arraycopy(initialCapacities, 0, equipmentCapacities, 0, 3);
+        capacityIncreaseRate = increaseRate;
+    }
+
+    public double[] decideEquipmentCapacity(int year) {
+        return equipmentCapacities;
+    }
+
+    public void updateCapacities(int year) {
+        for (int i = 0; i < equipmentCapacities.length; i++) {
+            equipmentCapacities[i] *= (1 + capacityIncreaseRate);
+        }
+    }
+}

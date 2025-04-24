@@ -1,0 +1,59 @@
+import java.util.Arrays;
+
+public class Individual {
+    private double wasteProduction;
+    private double compostingIntention;
+    private double sortingIntention;
+    private double[] P;
+    private double[] Bpf;
+    private double[] Bpg;
+    private double b_pf;
+    private double b_pg;
+    private double r;
+    private double αcf_initial;
+    private double αcg_initial;
+    private double αsf_initial;
+    private double αsg_initial;
+
+    public Individual(int sizeData, double[] params) {
+        b_pf = params[5];
+        b_pg = params[6];
+        αcf_initial = params[7];
+        αcg_initial = params[8];
+        αsf_initial = params[9];
+        αsg_initial = params[13];
+        r = params[20];
+        P = new double[sizeData];
+        Bpf = new double[sizeData];
+        Bpg = new double[sizeData];
+        Arrays.fill(P, 0.0);
+        Arrays.fill(Bpf, 0.0);
+        Arrays.fill(Bpg, 0.0);
+        P[0] = 1.0;
+        Bpf[0] = b_pf * P[0];
+        Bpg[0] = b_pg * P[0];
+    }
+
+    public void computeWaste(int year, double αpf_target, double[] sigmoideABP) {
+        P[year] = P[year - 1] * (1 + r);
+        Bpf[year] = b_pf * (1 - αpf_target * sigmoideABP[year]) * P[year];
+        Bpg[year] = b_pg * (1 - αpf_target * sigmoideABP[year]) * P[year];
+    }
+
+    public void computeBehavioralIntentions(int year, double[] sigmoide_mcf, double[] sigmoide_mcg, 
+                                           double[] sigmoide_msf, double[] sigmoide_msg) {
+        compostingIntention = αcf_initial + ((1 - αcf_initial) * sigmoide_mcf[year - 1]);
+        compostingIntention = Math.min(compostingIntention, 1.0);
+        sortingIntention = αsf_initial + ((1 - αsf_initial) * sigmoide_msf[year]);
+        double totalIntention = compostingIntention + sortingIntention;
+        if (totalIntention > 1.0) {
+            sortingIntention = 1 - compostingIntention;
+        }
+    }
+
+    public double getPopulation(int year) { return P[year]; }
+    public double getFoodWaste(int year) { return Bpf[year]; }
+    public double getGreenWaste(int year) { return Bpg[year]; }
+    public double getCompostingIntention() { return compostingIntention; }
+    public double getSortingIntention() { return sortingIntention; }
+}
